@@ -262,7 +262,7 @@ body::before {
 .pill.warn { color: var(--warning); }
 .pill.crit { color: var(--danger); }
 
-/* Grid responsive de chips del mapa */
+/* Grid responsive de chips del mapa (vista normal) */
 .statusmap-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -290,6 +290,25 @@ body::before {
 .sm-heat  { margin-top: .45rem; display: grid; grid-auto-flow: column; gap: 3px; }
 .sq { width: 10px; height: 10px; background: rgba(255,255,255,0.12); border-radius: 2px; }
 .sq.on { background: linear-gradient(135deg, var(--info), var(--success)); }
+
+/* --- Modo compacto (solo icono + nombre) --- */
+.statusmap-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: .6rem;
+}
+.sm-chip.compact { grid-template-columns: 36px 1fr; padding: .6rem .7rem; }
+.sm-chip.compact .sm-icon { width: 36px; height: 36px; font-size: 1rem; }
+.sm-chip.compact .sm-title { font-size: 0.9rem; font-weight: 700; }
+/* Overrides de color por estado (más notorios) */
+.sm-chip.ok   { box-shadow: inset 0 0 0 2px rgba(72,187,120,.22); }
+.sm-chip.warn { box-shadow: inset 0 0 0 2px rgba(237,137,54,.22); }
+.sm-chip.crit { box-shadow: inset 0 0 0 2px rgba(245,101,101,.22); }
+.sm-chip.ok   .sm-title { color: var(--success); }
+.sm-chip.warn .sm-title { color: var(--warning); }
+.sm-chip.crit .sm-title { color: var(--danger); }
+.sm-chip.ok   .sm-icon { background: linear-gradient(135deg, var(--success), #68d391); }
+.sm-chip.warn .sm-icon { background: linear-gradient(135deg, var(--warning), #f6ad55); }
+.sm-chip.crit .sm-icon { background: linear-gradient(135deg, var(--danger),  #fc8181); }
 
 /* ========================
    Modal (detalle de sensor)
@@ -365,6 +384,7 @@ body::before {
   .status-indicator { font-size: .8rem; }
 
   .statusmap-grid { grid-template-columns: 1fr; }
+  .statusmap-grid.compact { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 
   .modal-card { width: 96vw; }
   .modal-kpis { grid-template-columns: 1fr; }
