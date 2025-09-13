@@ -293,12 +293,12 @@ body::before {
 
 /* --- Modo compacto (solo icono + nombre) --- */
 .statusmap-grid.compact {
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: .6rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 2fr));
+  gap: .5rem;
 }
 .sm-chip.compact { grid-template-columns: 36px 1fr; padding: .6rem .7rem; }
 .sm-chip.compact .sm-icon { width: 36px; height: 36px; font-size: 1rem; }
-.sm-chip.compact .sm-title { font-size: 0.9rem; font-weight: 700; }
+.sm-chip.compact .sm-title { font-size: .9rem; font-weight: 700; }
 /* Overrides de color por estado (más notorios) */
 .sm-chip.ok   { box-shadow: inset 0 0 0 2px rgba(72,187,120,.22); }
 .sm-chip.warn { box-shadow: inset 0 0 0 2px rgba(237,137,54,.22); }
@@ -384,7 +384,7 @@ body::before {
   .status-indicator { font-size: .8rem; }
 
   .statusmap-grid { grid-template-columns: 1fr; }
-  .statusmap-grid.compact { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .statusmap-grid.compact { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
 
   .modal-card { width: 96vw; }
   .modal-kpis { grid-template-columns: 1fr; }
