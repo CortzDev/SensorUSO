@@ -19,7 +19,7 @@ function Header({ status, lastUpdate }) {
     return (
         <header className="header">
             <div className="header-row">
-              <h1><i className="fas fa-home"></i> Sensor Cara Sucia</h1>
+              <h1><i className="fas fa-home"></i> Sensor Zona 1</h1>
               <ThemeToggle />
             </div>
             <p className="subtitle">Monitor Ambiental Inteligente</p>
