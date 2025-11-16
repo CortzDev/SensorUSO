@@ -32,6 +32,29 @@
   --text-strong: #111827;
 }
 
+/* =========================================
+   TEMA OSCURO REAL (fondo negro + glass oscuro)
+========================================= */
+:root[data-theme='dark'] {
+  --primary-gradient: radial-gradient(circle at 20% 20%, #0a0a0a 0%, #000 100%);
+ /* Fondo puro negro */
+
+  --glass-bg: rgba(20, 20, 20, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --shadow-light: rgba(0, 0, 0, 0.7);
+
+  --text: rgba(255,255,255,0.85);
+  --text-soft: rgba(255,255,255,0.60);
+  --text-strong: #ffffff;
+
+  --success: #4ade80;
+  --warning: #fb923c;
+  --danger:  #f87171;
+  --info:    #60a5fa;
+
+  --muted:   #6b7280;
+}
+
 /* ========================
    Reset & layout base
 ======================== */
@@ -40,57 +63,66 @@
 body {
   font-family: 'Inter', sans-serif;
   background: var(--primary-gradient);
+  color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+.api-good {
+  color: var(--success);   /* verde */
+  font-weight: 700;
+}
+
+.api-fail {
+  color: var(--danger);    /* rojo */
+  font-weight: 700;
+}
+
+/* ========================
+   Fondo de grid
+======================== */
 body::before {
   content: '';
-  position: fixed; inset: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
-  pointer-events: none; z-index: 0;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Grid base (modo oscuro): líneas blancas visibles */
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><pattern id='grid' width='10' height='10' patternUnits='userSpaceOnUse'><path d='M10 0 L0 0 0 10' fill='none' stroke='rgba(255,255,255,0.16)' stroke-width='0.5'/></pattern></defs><rect width='100%' height='100%' fill='url(%23grid)'/></svg>");
+  mix-blend-mode: soft-light;
+  opacity: 1;
 }
 
+/* En modo claro: mismas líneas pero oscuras para que se noten más */
+:root[data-theme='light'] body::before {
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><pattern id='grid' width='10' height='10' patternUnits='userSpaceOnUse'><path d='M10 0 L0 0 0 10' fill='none' stroke='rgba(0,0,0,0.16)' stroke-width='0.6'/></pattern></defs><rect width='100%' height='100%' fill='url(%23grid)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+/* container */
 .container { position: relative; z-index: 1; max-width: 1600px; margin: 0 auto; padding: 2rem; }
 
 /* Wrapper para centrar secciones amplias */
-.section-wrapper {
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
+.section-wrapper { max-width: 1400px; margin: 0 auto; width: 100%; }
 
 /* ========================
    Header
 ======================== */
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-  animation: slideInDown 0.9s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
+.header { text-align: center; margin-bottom: 2rem; animation: slideInDown 0.9s cubic-bezier(0.23, 1, 0.32, 1); }
 .header-row { display: flex; align-items: center; justify-content: center; gap: 1rem; }
 .header h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--text-strong);
-  text-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  letter-spacing: -0.02em;
+  font-size: 3rem; font-weight: 700; color: var(--text-strong);
+  text-shadow: 0 4px 20px rgba(0,0,0,0.2); letter-spacing: -0.02em;
 }
-
 .subtitle { font-size: 1.1rem; color: var(--text-soft); font-weight: 400; margin: 0.25rem 0 1.25rem; }
 
 .theme-toggle {
-  border: 0;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  color: var(--text);
-  cursor: pointer;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 24px var(--shadow-light);
-  transition: transform .2s ease;
+  border: 0; background: var(--glass-bg); border: 1px solid var(--glass-border);
+  width: 44px; height: 44px; border-radius: 12px; color: var(--text);
+  cursor: pointer; backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px var(--shadow-light); transition: transform .2s ease;
 }
 .theme-toggle:hover { transform: translateY(-2px); }
 
@@ -98,23 +130,17 @@ body::before {
    Barra de estado y API
 ======================== */
 .status-bar {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  padding: 0.9rem 1.5rem;
-  border-radius: 50px;
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px var(--shadow-light);
-  flex-wrap: wrap;
-  justify-content: center;
+  display: inline-flex; align-items: center; gap: 1rem;
+  background: var(--glass-bg); backdrop-filter: blur(20px);
+  padding: 0.9rem 1.5rem; border-radius: 50px;
+  border: 1px solid var(--glass-border); box-shadow: 0 8px 32px var(--shadow-light);
+  flex-wrap: wrap; justify-content: center;
 }
 .status-indicator { display: flex; align-items: center; gap: 0.5rem; color: var(--text); font-weight: 500; font-size: 0.9rem; }
 .pulse-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 .pulse-dot.offline { background: var(--danger); animation: none; }
 
-.api-info { margin-top: .8rem; text-align: center; color: var(--text-soft); font-size: 0.85rem; }
+.api-info { margin-top: .8rem; text-align: center; color: var(--text-soft); font-size: .85rem; }
 .api-url { color: var(--info); text-decoration: none; font-weight: 600; }
 .api-url:hover { text-decoration: underline; }
 
@@ -124,27 +150,25 @@ body::before {
 .banner {
   display: flex; align-items: center; gap: .5rem;
   padding: .8rem 1rem; border-radius: 12px; margin: 0 auto 1.25rem;
-  background: linear-gradient(135deg, rgba(245, 101, 101, 0.08), rgba(245, 101, 101, 0.04));
-  border: 1px solid rgba(245, 101, 101, 0.25);
-  color: var(--text-strong); max-width: 900px;
+  background: linear-gradient(135deg, rgba(245,101,101,0.08), rgba(245,101,101,0.04));
+  border: 1px solid rgba(245,101,101,0.25); color: var(--text-strong); max-width: 900px;
   box-shadow: 0 8px 24px var(--shadow-light);
 }
 .banner-danger i { color: var(--danger); }
 .banner-note { color: var(--text-soft); font-size: .9rem; }
 
 .footer {
-  margin-top: 2rem;
-  display: flex; align-items: center; justify-content: center;
-  gap: .5rem; color: var(--text-soft); font-size: .9rem;
+  margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: .5rem;
+  color: var(--text-soft); font-size: .9rem;
 }
 .footer-dot { width: 4px; height: 4px; background: var(--text-soft); border-radius: 50%; display: inline-block; }
 
 /* ========================
-   GRID de tarjetas (responsive)
+   GRID de tarjetas (dashboard general)
 ======================== */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Desktop: reparte bien; Mobile: col */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.2rem;
   margin-top: 1.2rem;
   align-items: stretch;
@@ -154,22 +178,16 @@ body::before {
    Tarjetas métricas
 ======================== */
 .metric-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 1.6rem;
-  box-shadow: 0 8px 32px var(--shadow-light);
+  background: var(--glass-bg); backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border); border-radius: 20px;
+  padding: 1.6rem; box-shadow: 0 8px 32px var(--shadow-light);
   transition: all .35s cubic-bezier(0.23, 1, 0.32, 1);
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
   animation: slideInUp .75s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  opacity: 0; transform: translateY(20px);
-  cursor: default;
+  opacity: 0; transform: translateY(20px); cursor: default;
 }
 .metric-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, var(--success), var(--info));
   transform: scaleX(0); transition: transform .25s ease; transform-origin: left;
 }
@@ -238,6 +256,7 @@ body::before {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: 0 8px 24px var(--shadow-light);
+  z-index: 1;
 }
 
 .statusmap-header {
@@ -262,13 +281,16 @@ body::before {
 .pill.warn { color: var(--warning); }
 .pill.crit { color: var(--danger); }
 
-/* Grid responsive de chips del mapa (vista normal) */
+/* --- GRID STATUSMAP ---
+   Desktop: 4 columnas fijas (4 x N)
+---------------------------- */
 .statusmap-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: .75rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columnas siempre en desktop */
+  gap: 0.9rem;
 }
 
+/* chips */
 .sm-chip {
   display: grid; grid-template-columns: 42px 1fr;
   gap: .6rem; padding: .7rem .75rem;
@@ -284,6 +306,7 @@ body::before {
   width: 42px; height: 42px; border-radius: 10px;
   display:flex; align-items:center; justify-content:center;
   color:#fff; background: linear-gradient(135deg, var(--info), var(--success));
+  transition: background .28s ease, color .28s ease, transform .18s ease;
 }
 .sm-title { font-weight: 800; color: var(--text-strong); font-size: .95rem; }
 .sm-note  { color: var(--text-soft);   font-size: .85rem; margin-top: .1rem; }
@@ -293,12 +316,13 @@ body::before {
 
 /* --- Modo compacto (solo icono + nombre) --- */
 .statusmap-grid.compact {
-  grid-template-columns: repeat(auto-fit, minmax(160px, 2fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: .5rem;
 }
 .sm-chip.compact { grid-template-columns: 36px 1fr; padding: .6rem .7rem; }
 .sm-chip.compact .sm-icon { width: 36px; height: 36px; font-size: 1rem; }
 .sm-chip.compact .sm-title { font-size: .9rem; font-weight: 700; }
+
 /* Overrides de color por estado (más notorios) */
 .sm-chip.ok   { box-shadow: inset 0 0 0 2px rgba(72,187,120,.22); }
 .sm-chip.warn { box-shadow: inset 0 0 0 2px rgba(237,137,54,.22); }
@@ -313,12 +337,7 @@ body::before {
 /* ========================
    Modal (detalle de sensor)
 ======================== */
-.modal-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45); backdrop-filter: blur(2px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 50; animation: fadeIn .15s ease;
-}
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 50; animation: fadeIn .15s ease; }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 
 .modal-card {
@@ -329,10 +348,7 @@ body::before {
   box-shadow: 0 20px 60px var(--shadow-light);
   color: var(--text);
 }
-.modal-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 1.25rem; border-bottom: 1px solid var(--glass-border);
-}
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--glass-border); }
 .modal-header h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-strong); }
 .modal-close { background: transparent; border: 0; color: var(--text); font-size: 1.1rem; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; }
 .modal-close:hover { background: rgba(255,255,255,0.08); }
@@ -364,6 +380,10 @@ body::before {
 @keyframes shimmer { 0% { transform: translateX(-100%);} 100% { transform: translateX(100%);} }
 @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1;} 50% { transform: scale(1.22); opacity: .75;} }
 
+/* Small visual hover */
+.sm-chip { transition: transform .15s ease, box-shadow .2s ease; }
+.sm-chip:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
+
 /* ========================
    Responsive
 ======================== */
@@ -371,22 +391,85 @@ body::before {
   .header h1 { font-size: 2.6rem; }
 }
 
-@media (max-width: 768px) {
+/* Tablet / móvil: 2 tarjetas por fila */
+@media (max-width: 1024px) {
   .container { padding: 1rem; }
   .header h1 { font-size: 2rem; }
   .subtitle { font-size: 1rem; }
 
-  .dashboard-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .dashboard-grid { 
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
   .metric-card { padding: 1.25rem; }
   .metric-value { font-size: 2rem; }
 
   .status-bar { padding: .7rem 1.2rem; gap: .6rem; }
   .status-indicator { font-size: .8rem; }
 
-  .statusmap-grid { grid-template-columns: 1fr; }
-  .statusmap-grid.compact { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .statusmap-grid.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .modal-card { width: 96vw; }
   .modal-kpis { grid-template-columns: 1fr; }
   .ranges ul { grid-template-columns: 1fr; }
+}
+
+/* Móviles muy estrechos: 1 tarjeta por fila */
+@media (max-width: 520px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- STATUSMAP RESPONSIVE 2xN – tarjetas compactas --- */
+@media (max-width: 950px) {
+  .statusmap-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.7rem !important;
+  }
+
+  .sm-chip {
+    grid-template-columns: 36px 1fr !important;
+    padding: 0.45rem 0.55rem !important;
+    border-radius: 10px !important;
+  }
+
+  .sm-chip .sm-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1.1rem !important;
+    border-radius: 10px !important;
+  }
+
+  .sm-title {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+  }
+
+  .sm-note {
+    font-size: 0.72rem !important;
+  }
+
+  .sm-heat .sq {
+    width: 8px !important;
+    height: 8px !important;
+  }
+}
+
+/* Pantallas muy pequeñas (ej: 390px) */
+@media (max-width: 520px) {
+  .statusmap-grid {
+    gap: 0.5rem !important;
+  }
+
+  .sm-chip .sm-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1rem !important;
+  }
+
+  .sm-title {
+    font-size: 0.75rem !important;
+  }
 }
