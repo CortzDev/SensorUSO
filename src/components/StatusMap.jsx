@@ -1,14 +1,9 @@
 import React, { useMemo } from 'react';
 import { sensorConfig } from '../utils/sensorConfig';
 
-/**
- * StatusMap — versión simple y ordenada
- * - No hace filas manuales: renderiza todos los items en un solo grid.
- * - El CSS se encarga del orden y del responsive (2x5 en móvil).
- * - Mantiene la clasificación ok/warn/crit y los icons.
- */
 export default function StatusMap({ sensors = [] }) {
   const items = useMemo(() => {
+    // Clasifica cada sensor para colorear (ok / warn / crit)
     const classify = (s) => {
       if (s.code === 'air_quality_index') {
         if (s.value === 'level_1') return 'ok';
@@ -31,18 +26,11 @@ export default function StatusMap({ sensors = [] }) {
         if (s.value <= 20) return 'warn';
         return 'ok';
       }
+      // Por defecto: ok
       return 'ok';
     };
 
-    // Filtrar sensores si deseas ocultar algunos (opcional)
-    const ocultar = ['battery_percentage', 'battery_status', 'estado_carga', 'charge_state'];
-    const filtered = sensors.filter(s => {
-      const code = (s.code || '').toLowerCase();
-      const name = (s.name || '').toLowerCase();
-      return !ocultar.some(k => code.includes(k) || name.includes(k));
-    });
-
-    return filtered.map((s) => {
+    return sensors.map((s) => {
       const cfg = sensorConfig[s.code] || {};
       return {
         key: s.code || s.name,
@@ -61,17 +49,15 @@ export default function StatusMap({ sensors = [] }) {
         </h3>
       </header>
 
-      {/* Un solo grid: el CSS decide cuántas columnas mostrar */}
-      <div className="statusmap-grid compact" role="list" aria-label="Mapa de estado general">
-        {items.map(it => (
+      <div className="statusmap-grid compact">
+        {items.map((it) => (
           <article
             key={it.key}
-            className={`sm-chip compact ${it.level}`}
+            className={`sm-chip compact ${it.level}`} // ← clase según estado
             aria-label={it.title}
             title={it.title}
-            role="listitem"
           >
-            <div className="sm-icon" aria-hidden><i className={it.icon} /></div>
+            <div className="sm-icon" aria-hidden><i className={it.icon}/></div>
             <div className="sm-body">
               <div className="sm-title">{it.title}</div>
             </div>

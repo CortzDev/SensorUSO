@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Header from './components/Header';
 import Dashboard from './components/Dashboard';
-import StatusMap from './components/StatusMap';
-import SensorModal from './components/SensorModal';
+import Analytics from './components/Analytics';
+import { LayoutDashboard, AreaChart as ChartsIcon, Smartphone, Settings, Waves, Menu, X } from 'lucide-react';
 import './App.css';
 
-const API_BASE_URL = 'https://apisensor-production.up.railway.app';
+// 👇 PON AQUÍ LA URL EXACTA DE TU API EN VIVO
+// Si es local puede ser 'http://localhost:3000' o la URL correcta de Railway
+const API_BASE_URL = 'https://apisensor-production.up.railway.app'; 
 
 function useSensorHistory(sensors, maxPoints = 30) {
   const historyRef = useRef(new Map());
@@ -16,9 +17,7 @@ function useSensorHistory(sensors, maxPoints = 30) {
       if (!key) return;
       if (!historyRef.current.has(key)) historyRef.current.set(key, []);
       const arr = historyRef.current.get(key);
-      const numeric = typeof s.value === 'number'
-        ? s.value
-        : (typeof s.value === 'boolean' ? (s.value ? 1 : 0) : NaN);
+      const numeric = typeof s.value === 'number' ? s.value : NaN;
       if (!Number.isNaN(numeric)) {
         arr.push(numeric);
         if (arr.length > maxPoints) arr.shift();
@@ -34,16 +33,13 @@ function useSensorHistory(sensors, maxPoints = 30) {
 function App() {
   const [sensors, setSensors] = useState([]);
   const [status, setStatus] = useState({ connected: false, message: 'Conectando...' });
-  const [lastUpdate, setLastUpdate] = useState('--:--:--');
-  const [error, setError] = useState(null);
   const [isHidden, setIsHidden] = useState(document.hidden);
 
-  const history = useSensorHistory(sensors);
+  const [activeView, setActiveView] = useState('dashboard');
+  const [selectedLocation, setSelectedLocation] = useState('Cara Sucia');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const [selected, setSelected] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
-  const openDetail = (sensor) => { setSelected(sensor); setOpenModal(true); };
-  const closeDetail = () => setOpenModal(false);
+  const history = useSensorHistory(sensors);
 
   useEffect(() => {
     const onVisibility = () => setIsHidden(document.hidden);
@@ -53,84 +49,111 @@ function App() {
 
   useEffect(() => {
     let fetchInterval;
-    let backoff = 3000;
-
     const fetchSensors = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/sensors/formatted`, { cache: 'no-store' });
-        if (!response.ok) throw new Error('Error en la respuesta de la red');
+        if (!response.ok) throw new Error('Network error');
         const data = await response.json();
+        
         if (data.success && data.sensors) {
           setSensors(data.sensors);
-          setStatus({ connected: true, message: 'Conectado' });
-          setError(null);
-          setLastUpdate(
-            new Date().toLocaleTimeString('es-ES', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-          );
-          backoff = 3000;
-        } else {
-          throw new Error('No se encontraron datos de sensores');
+          setStatus({ connected: true, message: 'Live' });
         }
       } catch (err) {
-        setStatus({ connected: false, message: 'Error de conexión' });
-        setError(err.message);
-        backoff = Math.min(backoff * 1.6, 20000);
+        console.error("Error consultando API:", err);
+        setStatus({ connected: false, message: 'Reconectando...' });
       }
     };
 
     fetchSensors();
-
-    fetchInterval = setInterval(fetchSensors, isHidden ? 10000 : backoff);
-
-    const timer = setInterval(() => {
-      setLastUpdate(
-        new Date().toLocaleTimeString('es-ES', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      );
-    }, 1000);
-
-    return () => {
-      clearInterval(fetchInterval);
-      clearInterval(timer);
-    };
+    fetchInterval = setInterval(fetchSensors, isHidden ? 10000 : 3000);
+    return () => clearInterval(fetchInterval);
   }, [isHidden]);
 
-  return (
-    <div className="container">
-      <Header status={status} lastUpdate={lastUpdate} />
+  const handleNavClick = (view) => {
+    setActiveView(view);
+    setIsMobileMenuOpen(false);
+  };
 
-      {!status.connected && (
-        <div className="banner banner-danger" role="status" aria-live="polite">
-          <i className="fas fa-triangle-exclamation" /> Conexión perdida. Intentando reconectar...
-          {error && <span className="banner-note"> ({error})</span>}
-        </div>
+  const DevicesView = () => <div className="placeholder-view">Gestión de dispositivos en construcción.</div>;
+  const SettingsView = () => <div className="placeholder-view">Configuración del sistema.</div>;
+
+  return (
+    <div className="app-container">
+      
+      {isMobileMenuOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
       )}
 
-      <div className="section-wrapper">
-        <StatusMap sensors={sensors} />
-      </div>
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+        <div>
+          <div className="sidebar-header">
+            <h1><Waves size={20} color="#a1a1aa"/> SensorOuso</h1>
+            <button className="mobile-close-btn" onClick={() => setIsMobileMenuOpen(false)}>
+              <X size={24} color="#a1a1aa" />
+            </button>
+          </div>
+          
+          <nav className="nav-links">
+            <button className={`nav-link ${activeView === 'dashboard' ? 'active' : ''}`} onClick={() => handleNavClick('dashboard')}>
+              <LayoutDashboard size={20} /> Dashboard
+            </button>
+            <button className={`nav-link ${activeView === 'charts' ? 'active' : ''}`} onClick={() => handleNavClick('charts')}>
+              <ChartsIcon size={20} /> Charts
+            </button>
+            <button className={`nav-link ${activeView === 'devices' ? 'active' : ''}`} onClick={() => handleNavClick('devices')}>
+              <Smartphone size={20} /> Devices
+            </button>
+            <button className={`nav-link ${activeView === 'settings' ? 'active' : ''}`} onClick={() => handleNavClick('settings')}>
+              <Settings size={20} /> Settings
+            </button>
+          </nav>
+        </div>
+        
+        <div className="sidebar-footer">
+          <div className="avatar"></div> Profile
+        </div>
+      </aside>
 
-      <div className="section-wrapper">
-        <Dashboard
-          sensors={sensors}
-          status={status}
-          history={history}
-          onOpenDetail={openDetail}
-        />
-      </div>
+      <main className="main-content">
+        <header className="header-bar">
+          <div className="header-left">
+            <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
+              <Menu size={28} color="#f4f4f5" />
+            </button>
+            
+            <div className="header-title-section">
+              <h1>{activeView === 'dashboard' ? 'Sensor Dashboard' : 'Análisis de Datos'}</h1>
+              <p>{activeView === 'dashboard' ? 'Monitoreo Ambiental en Tiempo Real' : 'Comparativa de tendencias históricas'}</p>
+            </div>
+          </div>
+          
+          <div className="location-tabs-container">
+            <div className="location-tabs">
+              {['Cara Sucia', 'Nahuizalco', 'Juayua'].map(location => (
+                <button 
+                  key={location} 
+                  className={`location-tab ${selectedLocation === location ? 'active' : ''}`}
+                  onClick={() => setSelectedLocation(location)}
+                >
+                  {location}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="status-indicator">
+             <div className={`status-dot ${status.connected ? 'green' : 'red'}`}></div>
+          </div>
+        </header>
 
-      <SensorModal
-        open={openModal}
-        onClose={closeDetail}
-        sensor={selected}
-        history={selected ? history[selected.code || selected.name] : []}
-        unit={selected ? (selected.unit || '') : ''}
-      />
-
-      <footer className="footer">
-        <span>© {new Date().getFullYear()} Sensor Cara Sucia · Monitor Ambiental</span>
-        <span className="footer-dot" />
-        <a href={API_BASE_URL} target="_blank" rel="noreferrer" className="api-url">API</a>
-      </footer>
+        <div className="dashboard-view-container">
+          {activeView === 'dashboard' && <Dashboard sensors={sensors} history={history} />}
+          {activeView === 'charts' && <Analytics history={history} />}
+          {activeView === 'devices' && <DevicesView />}
+          {activeView === 'settings' && <SettingsView />}
+        </div>
+      </main>
     </div>
   );
 }

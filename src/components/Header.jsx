@@ -19,10 +19,10 @@ function Header({ status, lastUpdate }) {
     return (
         <header className="header">
             <div className="header-row">
-              <h1><i className="fas fa-home"></i> Cara Sucia</h1>
+              <h1><i className="fas fa-home"></i> Sensor Zona 1</h1>
               <ThemeToggle />
             </div>
-            <p className="subtitle">Monitor Ambiental Ahuchapan</p>
+            <p className="subtitle">Monitor Ambiental Inteligente</p>
             <div className="status-bar" role="status" aria-live="polite">
                 <div className="status-indicator">
                     <div className={`pulse-dot ${!status.connected ? 'offline' : ''}`}></div>
@@ -38,10 +38,11 @@ function Header({ status, lastUpdate }) {
                 </div>
                 <div className="status-indicator">
                     <i className="fas fa-server"></i>
-                    <span className={status.connected ? "api-good" : "api-fail"}>
-                      API {status.connected ? "Good" : "Fail"}
-                    </span>
+                    <span>Railway {status.connected ? '✓' : '✗'}</span>
                 </div>
+            </div>
+            <div className="api-info">
+                Conectado a: <a href={API_BASE_URL} className="api-url" target="_blank" rel="noopener noreferrer">{API_BASE_URL}</a>
             </div>
         </header>
     );
