@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Download, RefreshCw, BarChart2, Activity } from 'lucide-react';
 
-// API Local/Interna exclusiva para el análisis de datos históricos
-const API_BASE_URL = 'http://localhost:8000'; 
+// URL de tu API en producción (Railway)
+const API_BASE_URL = 'https://apisensor-production.up.railway.app'; 
 
 export default function Analytics() {
   const [var1, setVar1] = useState('co2_value');
